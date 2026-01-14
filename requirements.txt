@@ -2,3 +2,7 @@ fastapi
 uvicorn[standard]
 SQLAlchemy
 dotenv
+psycopg2
+pydantic-settings
+hashids
+bcrypt
