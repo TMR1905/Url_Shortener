@@ -62,7 +62,12 @@ class URL(Base):
     def is_expired(self):
         """Check if the URL has expired"""
         if self.expires_at is not None:
-            return datetime.now(timezone.utc) > self.expires_at
+            now = datetime.now(timezone.utc)
+            # Handle both timezone-aware and naive datetimes from database
+            if self.expires_at.tzinfo is None:
+                # Naive datetime - assume it's UTC
+                return now.replace(tzinfo=None) > self.expires_at
+            return now > self.expires_at
         return False
 
     def has_reached_max_clicks(self):

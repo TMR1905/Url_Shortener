@@ -4,12 +4,22 @@ from sqlalchemy.orm import sessionmaker, Session
 from typing import Generator
 from models.url import Base
 
-engine = create_engine(settings.DATABASE_URL,
-                       echo=settings.DB_ECHO,
-                       pool_pre_ping=True,
-                       pool_size=5,
-                       max_overflow=10
-                       )
+# SQLite doesn't support pool_size and max_overflow
+# Check if we're using SQLite (for testing) or Postgres (production)
+if settings.DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        settings.DATABASE_URL,
+        echo=settings.DB_ECHO,
+        connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_engine(
+        settings.DATABASE_URL,
+        echo=settings.DB_ECHO,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
